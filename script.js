@@ -9,6 +9,10 @@ const totalFloors = 10;
 const floorHeight = 50;
 let activeFloor = 1;
 let isMoving = false; // Prevent overlapping actions
+let direction = null; // up eller ner för hiss logiken
+let innerbutton = []; // knapparna inom hissen
+let outerbutton = []; // knapparna för varje våning
+
 
 // Function to move the elevator
 function moveToFloor(floor, callback) {
@@ -36,6 +40,37 @@ function openDoors(callback) {
   rightDoor.classList.add("open");
   setTimeout(callback, 1000); // Wait for the door opening animation to complete
 }
+
+function getNextStop() {  // funktion för att bestämma ifall den ska stanna på en våning innan den bestämda våningen
+  let candidates = [];
+
+  innerQueue.forEach(floor => candidates.push({ floor, source: "inner", dir: null }));
+
+  outerQueue.forEach(req => {
+    if (direction === null || req.dir === direction) {
+      candidates.push({ floor: req.floor, source: "outer", dir: req.dir });
+    }
+  });
+
+  if (direction === "down") {
+    candidates = candidates.filter(c => c.floor < activeFloor);
+    candidates.sort((a, b) => b.floor - a.floor); 
+  } else {
+    
+    candidates = candidates.filter(c => c.floor > activeFloor);
+    candidates.sort((a, b) => a.floor - b.floor); 
+  }
+
+  if (candidates.length > 0) return candidates[0];
+
+  if (outerQueue.length > 0 || innerQueue.length > 0) {
+    direction = direction === "up" ? "down" : "up";
+    return getNextStop();
+  }
+
+  return null; 
+}
+
 
 buttons.forEach(button => {
   button.addEventListener("click", () => {
