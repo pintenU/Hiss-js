@@ -41,28 +41,30 @@ function openDoors(callback) {
   setTimeout(callback, 1000); // Wait for the door opening animation to complete
 }
 
-function getNextStop() {  // funktion för att bestämma ifall den ska stanna på en våning innan den bestämda våningen
+// SCAN algoritm för att bestämma ordningen av stopp
+function getNextStop() { 
   let candidates = [];
 
-  innerQueue.forEach(floor => candidates.push({ floor, source: "inner", dir: null }));
+  innerQueue.forEach(floor => candidates.push({ floor, source: "inner", dir: null })); // Knapparna inom hissen på hisskonsolen
 
   outerQueue.forEach(req => {
     if (direction === null || req.dir === direction) {
-      candidates.push({ floor: req.floor, source: "outer", dir: req.dir });
+      candidates.push({ floor: req.floor, source: "outer", dir: req.dir }); // Knapparna utanför hissarna, används bara om det är i rätt riktning
     }
   });
 
   if (direction === "down") {
     candidates = candidates.filter(c => c.floor < activeFloor);
-    candidates.sort((a, b) => b.floor - a.floor); 
+    candidates.sort((a, b) => b.floor - a.floor);  // bestämmer ifall det finns ett stop påväg ner
   } else {
     
     candidates = candidates.filter(c => c.floor > activeFloor);
-    candidates.sort((a, b) => a.floor - b.floor); 
+    candidates.sort((a, b) => a.floor - b.floor);  // istället för när hissen åker upp
   }
 
-  if (candidates.length > 0) return candidates[0];
+  if (candidates.length > 0) return candidates[0]; 
 
+// Kollar ifall det finns något efter stopp, åker i dens riktning ifall det finns
   if (outerQueue.length > 0 || innerQueue.length > 0) {
     direction = direction === "up" ? "down" : "up";
     return getNextStop();
@@ -71,6 +73,15 @@ function getNextStop() {  // funktion för att bestämma ifall den ska stanna p�
   return null; 
 }
 
+// Tar bort våning ifall den har nått fram
+function removeFromQueue(floor, source, dir) {
+  if (source === "inner") {
+    innerQueue = innerQueue.filter(f => f !== floor);
+  } else {
+    outerQueue = outerQueue.filter(r => !(r.floor === floor && r.dir === dir));
+  }
+  clearButtonHighlight(floor, source, dir);
+}
 
 buttons.forEach(button => {
   button.addEventListener("click", () => {
