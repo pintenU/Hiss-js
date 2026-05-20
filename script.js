@@ -58,10 +58,27 @@ function runQueue() {
             isMoving = false;
             runQueue(); // fortsätt inom kön
           });
-        }, 1500);
+        }, 1000);
       });
     });
   });
+}
+ 
+function addToQueue(floor, button) {
+  if (floor === activeFloor && !isMoving) {
+    updateDisplay("Du är redan på våning:", floor);
+    return;
+  }
+ 
+  // Ifall det inte finns lägg till i kö
+  const alreadyQueued = queue.some(item => item.floor === floor && item.button === button);
+  if (alreadyQueued) return;
+ 
+  queue.push({ floor, button });
+  button.classList.add("pushed");
+  updateDisplay("Lagt till i kön, våning:", floor);
+ 
+  runQueue();
 }
  
 
