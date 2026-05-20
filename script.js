@@ -81,7 +81,19 @@ function addToQueue(floor, button) {
   runQueue();
 }
  
-
+// Inre panel
+document.querySelectorAll('.floor-buttons [data-floor]').forEach(button => {
+  button.addEventListener("click", () => {
+    addToQueue(parseInt(button.getAttribute("data-floor")), button);
+  });
+});
+ 
+// Yttre knappar
+document.querySelectorAll('.floors [data-floor]').forEach(button => {
+  button.addEventListener("click", () => {
+    addToQueue(parseInt(button.getAttribute("data-floor")), button);
+  });
+});
 
 btnResetDisplay.addEventListener('click', () => {
   display.innerHTML = "";
