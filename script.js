@@ -47,10 +47,10 @@ function runQueue() {
   updateDisplay("Åker till våning:", next.floor);
  
   closeDoors(() => {
-    moveToFloor(next.floor, () => {
+    moveToFloor(next.floor, () => { // funktion för att röra sig till nästa våning
       activeFloor = next.floor;
       next.button.classList.remove("pushed");
-      updateDisplay("Stannar på våning:", activeFloor);
+      updateDisplay("Stannar på våning:", activeFloor); 
  
       openDoors(() => {
         setTimeout(() => {
@@ -81,14 +81,14 @@ function addToQueue(floor, button) {
   runQueue();
 }
  
-// Inre panel
+// knappar inom hissen
 document.querySelectorAll('.floor-buttons [data-floor]').forEach(button => {
   button.addEventListener("click", () => {
     addToQueue(parseInt(button.getAttribute("data-floor")), button);
   });
 });
  
-// Yttre knappar
+// knappar utanför hissen
 document.querySelectorAll('.floors [data-floor]').forEach(button => {
   button.addEventListener("click", () => {
     addToQueue(parseInt(button.getAttribute("data-floor")), button);
